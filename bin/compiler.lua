@@ -595,7 +595,7 @@ local function compile_atom(x)
                     if number63(x) then
                       return x .. ""
                     else
-                      error("Cannot compile atom: " .. str(x))
+                      return error("Cannot compile atom: " .. str(x))
                     end
                   end
                 end
@@ -827,9 +827,11 @@ local function lower_set(args, hoist, stmt63, tail63)
   local ____id16 = args
   local __lh = ____id16[1]
   local __rh = ____id16[2]
-  add(hoist, {"%set", lower(__lh, hoist), lower(__rh, hoist)})
+  local __lh1 = lower(__lh, hoist)
+  local __rh1 = lower(__rh, hoist)
+  add(hoist, {"%set", __lh1, __rh1})
   if not( stmt63 and not tail63) then
-    return __lh
+    return __lh1
   end
 end
 local function lower_if(args, hoist, stmt63, tail63)
@@ -1029,7 +1031,7 @@ local function run(code)
   if f then
     return f()
   else
-    error(e .. " in " .. code)
+    return error(e .. " in " .. code)
   end
 end
 _37result = nil
@@ -1179,10 +1181,10 @@ end})
 setenv("typeof", {_stash = true, special = function (x)
   return "typeof(" .. compile(x) .. ")"
 end})
-setenv("error", {_stash = true, special = function (x)
+setenv("throw", {_stash = true, special = function (x)
   local __e48
   if target == "js" then
-    __e48 = "throw " .. compile({"new", {"Error", x}})
+    __e48 = "throw " .. compile(x)
   else
     __e48 = "error(" .. compile(x) .. ")"
   end

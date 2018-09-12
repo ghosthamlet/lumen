@@ -157,7 +157,7 @@
              (fn (m)
                (if (obj? m) m
                  (obj stack: ((get debug 'traceback))
-                      message: (if (string? m) (clip m (+ (search m ": ") 2))
+                      message: (if (string? m) (clip m (+ (or (search m ": ") -2) 2))
                                    (nil? m) ""
                                  (str m)))))))))
 
@@ -229,3 +229,7 @@
 
 (define-macro when-compiling body
   (eval `(do ,@body)))
+
+(define-macro during-compilation body
+  (with form `(do ,@body)
+    (eval form)))

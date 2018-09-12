@@ -449,10 +449,12 @@
       e)))
 
 (define lower-set (args hoist stmt? tail?)
-  (let ((lh rh) args)
-    (add hoist `(%set ,(lower lh hoist) ,(lower rh hoist)))
+  (let ((lh rh) args
+        lh1 (lower lh hoist)
+        rh1 (lower rh hoist))
+    (add hoist `(%set ,lh1 ,rh1))
     (unless (and stmt? (not tail?))
-      lh)))
+      lh1)))
 
 (define lower-if (args hoist stmt? tail?)
   (let ((cond then else) args)
@@ -678,9 +680,9 @@
 (define-special typeof (x)
   (cat "typeof(" (compile x) ")"))
 
-(define-special error (x) :stmt
+(define-special throw (x) :stmt
   (let e (if (= target 'js)
-             (cat "throw " (compile `(new (Error ,x))))
+             (cat "throw " (compile x))
            (cat "error(" (compile x) ")"))
     (cat (indentation) e)))
 
